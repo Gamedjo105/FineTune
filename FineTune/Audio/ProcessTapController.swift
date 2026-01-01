@@ -168,6 +168,23 @@ final class ProcessTapController {
         return sample >= 0 ? compressed : -compressed
     }
 
+    /// Cleans up partially created CoreAudio resources on activation failure.
+    /// Called when any step in activate() fails after resources were created.
+    private func cleanupPartialActivation() {
+        if let procID = deviceProcID {
+            AudioDeviceDestroyIOProcID(aggregateDeviceID, procID)
+            deviceProcID = nil
+        }
+        if aggregateDeviceID.isValid {
+            AudioHardwareDestroyAggregateDevice(aggregateDeviceID)
+            aggregateDeviceID = .unknown
+        }
+        if processTapID.isValid {
+            AudioHardwareDestroyProcessTap(processTapID)
+            processTapID = .unknown
+        }
+    }
+
     func invalidate() {
         guard activated else { return }
         defer { activated = false }
