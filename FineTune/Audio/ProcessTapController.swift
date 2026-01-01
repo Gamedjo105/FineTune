@@ -98,10 +98,17 @@ final class ProcessTapController {
         logger.debug("Created aggregate device #\(self.aggregateDeviceID)")
 
         // Compute ramp coefficient from actual device sample rate
-        let sampleRate = (try? aggregateDeviceID.readNominalSampleRate()) ?? 48000
+        let sampleRate: Float64
+        if let deviceSampleRate = try? aggregateDeviceID.readNominalSampleRate() {
+            sampleRate = deviceSampleRate
+            logger.info("Device sample rate: \(sampleRate) Hz")
+        } else {
+            sampleRate = 48000
+            logger.warning("Failed to read sample rate, using default: \(sampleRate) Hz")
+        }
         let rampTimeSeconds: Float = 0.030  // 30ms smoothing
         rampCoefficient = 1 - exp(-1 / (Float(sampleRate) * rampTimeSeconds))
-        logger.debug("Ramp coefficient: \(self.rampCoefficient) for sample rate \(sampleRate)")
+        logger.debug("Ramp coefficient: \(self.rampCoefficient)")
 
         // Create IO proc with gain processing
         err = AudioDeviceCreateIOProcIDWithBlock(&deviceProcID, aggregateDeviceID, queue) { [weak self] inNow, inInputData, inInputTime, outOutputData, inOutputTime in
