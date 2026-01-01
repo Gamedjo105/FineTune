@@ -21,9 +21,7 @@ final class AudioEngine {
         Task { @MainActor in
             monitor.start()
             monitor.onAppsChanged = { [weak self] _ in
-                Task { @MainActor in
-                    self?.applyPersistedVolumes()
-                }
+                self?.applyPersistedVolumes()
             }
             applyPersistedVolumes()
         }
