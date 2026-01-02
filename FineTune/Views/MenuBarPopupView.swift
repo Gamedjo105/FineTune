@@ -27,6 +27,11 @@ struct MenuBarPopupView: View {
                         volume: audioEngine.getVolume(for: app),
                         onVolumeChange: { volume in
                             audioEngine.setVolume(for: app, to: volume)
+                        },
+                        devices: audioEngine.outputDevices,
+                        selectedDeviceUID: audioEngine.getDeviceUID(for: app),
+                        onDeviceSelected: { deviceUID in
+                            audioEngine.setDevice(for: app, deviceUID: deviceUID)
                         }
                     )
                 }
@@ -42,6 +47,6 @@ struct MenuBarPopupView: View {
             .font(.caption)
         }
         .padding()
-        .frame(width: 320)
+        .frame(width: 450)
     }
 }

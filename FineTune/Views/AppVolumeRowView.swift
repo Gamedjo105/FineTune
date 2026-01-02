@@ -5,13 +5,26 @@ struct AppVolumeRowView: View {
     let app: AudioApp
     let volume: Float  // Linear gain 0-2
     let onVolumeChange: (Float) -> Void
+    let devices: [AudioDevice]
+    let selectedDeviceUID: String?
+    let onDeviceSelected: (String?) -> Void
 
     @State private var sliderValue: Double  // 0-1, log-mapped position
 
-    init(app: AudioApp, volume: Float, onVolumeChange: @escaping (Float) -> Void) {
+    init(
+        app: AudioApp,
+        volume: Float,
+        onVolumeChange: @escaping (Float) -> Void,
+        devices: [AudioDevice] = [],
+        selectedDeviceUID: String? = nil,
+        onDeviceSelected: @escaping (String?) -> Void = { _ in }
+    ) {
         self.app = app
         self.volume = volume
         self.onVolumeChange = onVolumeChange
+        self.devices = devices
+        self.selectedDeviceUID = selectedDeviceUID
+        self.onDeviceSelected = onDeviceSelected
         // Convert linear gain to slider position
         self._sliderValue = State(initialValue: VolumeMapping.gainToSlider(volume))
     }
@@ -25,10 +38,10 @@ struct AppVolumeRowView: View {
 
             Text(app.name)
                 .lineLimit(1)
-                .frame(width: 100, alignment: .leading)
+                .frame(width: 80, alignment: .leading)
 
             Slider(value: $sliderValue, in: 0...1)
-                .frame(minWidth: 100)
+                .frame(minWidth: 80)
                 .overlay(alignment: .center) {
                     // Unity marker at center (100% = native volume)
                     Rectangle()
@@ -45,7 +58,14 @@ struct AppVolumeRowView: View {
             Text("\(Int(sliderValue * 200))%")
                 .font(.caption)
                 .foregroundStyle(.secondary)
-                .frame(width: 45, alignment: .trailing)
+                .frame(width: 40, alignment: .trailing)
+
+            DevicePickerView(
+                devices: devices,
+                selectedDeviceUID: selectedDeviceUID,
+                onDeviceSelected: onDeviceSelected
+            )
+            .frame(maxWidth: 120)
         }
         .onChange(of: volume) { _, newValue in
             sliderValue = VolumeMapping.gainToSlider(newValue)
