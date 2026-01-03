@@ -42,6 +42,7 @@ final class ProcessTapController {
     // Ramp coefficient for ~30ms smoothing, computed from device sample rate on activation
     // Formula: 1 - exp(-1 / (sampleRate * rampTimeSeconds))
     private var rampCoefficient: Float = 0.0007  // Default, updated on activation
+    private var secondaryRampCoefficient: Float = 0.0007  // For secondary tap during crossfade
 
     var volume: Float {
         get { _volume }
@@ -232,12 +233,15 @@ final class ProcessTapController {
         // This also initializes _crossfadeTotalSamples and _secondarySampleCount
         try createSecondaryTap(for: newOutputUID)
 
-        // 2. Enable crossfade - secondary callback now drives progress via sample counting
-        logger.info("[CROSSFADE] Step 2: Starting sample-accurate crossfade (\(CrossfadeConfig.duration * 1000)ms)")
+        // 2. Wait for secondary tap to warm up (device needs time to start producing audio)
+        try await Task.sleep(for: .milliseconds(20))
+
+        // 3. Enable crossfade - secondary callback now drives progress via sample counting
+        logger.info("[CROSSFADE] Step 3: Starting sample-accurate crossfade (\(CrossfadeConfig.duration * 1000)ms)")
         _crossfadeProgress = 0
         _isCrossfading = true
 
-        // 3. Poll for completion (don't control timing - secondary callback does)
+        // 4. Poll for completion (don't control timing - secondary callback does)
         let timeoutMs = Int(CrossfadeConfig.duration * 1000) + 100  // Add 100ms safety margin
         let pollIntervalMs: UInt64 = 5
         var elapsedMs: Int = 0
@@ -250,8 +254,8 @@ final class ProcessTapController {
         // Small buffer to ensure final samples processed
         try await Task.sleep(for: .milliseconds(10))
 
-        // 4. Crossfade complete - destroy primary, promote secondary
-        logger.info("[CROSSFADE] Step 3: Crossfade complete (progress=\(self._crossfadeProgress)), promoting secondary")
+        // 5. Crossfade complete - destroy primary, promote secondary
+        logger.info("[CROSSFADE] Step 4: Crossfade complete (progress=\(self._crossfadeProgress)), promoting secondary")
         _isCrossfading = false
 
         destroyPrimaryTap()
@@ -316,6 +320,10 @@ final class ProcessTapController {
         }
         _crossfadeTotalSamples = CrossfadeConfig.totalSamples(at: sampleRate)
         _secondarySampleCount = 0
+
+        // Compute ramp coefficient for secondary device's sample rate
+        let rampTimeSeconds: Float = 0.030  // 30ms smoothing (same as primary)
+        secondaryRampCoefficient = 1 - exp(-1 / (Float(sampleRate) * rampTimeSeconds))
 
         // Initialize secondary volume to match primary for smooth handoff
         _secondaryCurrentVolume = _primaryCurrentVolume
@@ -604,7 +612,7 @@ final class ProcessTapController {
 
             for i in 0..<sampleCount {
                 // Per-sample volume ramping
-                currentVol += (targetVol - currentVol) * rampCoefficient
+                currentVol += (targetVol - currentVol) * secondaryRampCoefficient
 
                 // Apply ramped gain with crossfade multiplier
                 var sample = inputSamples[i] * currentVol * crossfadeMultiplier
