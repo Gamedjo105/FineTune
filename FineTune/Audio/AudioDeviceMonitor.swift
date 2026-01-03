@@ -75,6 +75,9 @@ final class AudioDeviceMonitor {
             for deviceID in deviceIDs {
                 guard deviceID.hasOutputStreams() else { continue }
                 guard !deviceID.isAggregateDevice() else { continue }
+                // Filter virtual audio devices (e.g., Microsoft Teams Audio, BlackHole)
+                // To include virtual devices, remove or comment out this line:
+                guard !deviceID.isVirtualDevice() else { continue }
 
                 guard let uid = try? deviceID.readDeviceUID(),
                       let name = try? deviceID.readDeviceName() else {

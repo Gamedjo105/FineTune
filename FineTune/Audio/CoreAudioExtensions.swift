@@ -170,6 +170,21 @@ extension AudioDeviceID {
         guard err == noErr else { return false }
         return classID == kAudioAggregateDeviceClassID
     }
+
+    /// Returns true if this device is a virtual audio device (not real hardware).
+    /// Virtual devices include app-created audio routing devices like Microsoft Teams Audio, BlackHole, etc.
+    func isVirtualDevice() -> Bool {
+        var address = AudioObjectPropertyAddress(
+            mSelector: kAudioDevicePropertyTransportType,
+            mScope: kAudioObjectPropertyScopeGlobal,
+            mElement: kAudioObjectPropertyElementMain
+        )
+        var transportType: UInt32 = 0
+        var size = UInt32(MemoryLayout<UInt32>.size)
+        let err = AudioObjectGetPropertyData(self, &address, 0, nil, &size, &transportType)
+        guard err == noErr else { return false }
+        return transportType == kAudioDeviceTransportTypeVirtual
+    }
 }
 
 // MARK: - Device Volume
