@@ -14,23 +14,25 @@ struct MenuBarPopupView: View {
             SectionHeader(title: "Output Devices")
                 .padding(.bottom, DesignTokens.Spacing.xs)
 
-            ForEach(sortedDevices) { device in
-                DeviceRow(
-                    device: device,
-                    isDefault: device.id == deviceVolumeMonitor.defaultDeviceID,
-                    volume: deviceVolumeMonitor.volumes[device.id] ?? 1.0,
-                    isMuted: deviceVolumeMonitor.muteStates[device.id] ?? false,
-                    onSetDefault: {
-                        deviceVolumeMonitor.setDefaultDevice(device.id)
-                    },
-                    onVolumeChange: { volume in
-                        deviceVolumeMonitor.setVolume(for: device.id, to: volume)
-                    },
-                    onMuteToggle: {
-                        let currentMute = deviceVolumeMonitor.muteStates[device.id] ?? false
-                        deviceVolumeMonitor.setMute(for: device.id, to: !currentMute)
-                    }
-                )
+            VStack(spacing: DesignTokens.Spacing.xs) {
+                ForEach(sortedDevices) { device in
+                    DeviceRow(
+                        device: device,
+                        isDefault: device.id == deviceVolumeMonitor.defaultDeviceID,
+                        volume: deviceVolumeMonitor.volumes[device.id] ?? 1.0,
+                        isMuted: deviceVolumeMonitor.muteStates[device.id] ?? false,
+                        onSetDefault: {
+                            deviceVolumeMonitor.setDefaultDevice(device.id)
+                        },
+                        onVolumeChange: { volume in
+                            deviceVolumeMonitor.setVolume(for: device.id, to: volume)
+                        },
+                        onMuteToggle: {
+                            let currentMute = deviceVolumeMonitor.muteStates[device.id] ?? false
+                            deviceVolumeMonitor.setMute(for: device.id, to: !currentMute)
+                        }
+                    )
+                }
             }
 
             Divider()
@@ -93,17 +95,21 @@ struct MenuBarPopupView: View {
             .padding(.bottom, DesignTokens.Spacing.xs)
 
         ScrollView {
-            VStack(alignment: .leading, spacing: 0) {
+            VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
                 ForEach(audioEngine.apps) { app in
                     if let deviceUID = audioEngine.getDeviceUID(for: app) {
                         AppRowWithLevelPolling(
                             app: app,
                             volume: audioEngine.getVolume(for: app),
+                            isMuted: audioEngine.getMute(for: app),
                             devices: audioEngine.outputDevices,
                             selectedDeviceUID: deviceUID,
                             getAudioLevel: { audioEngine.getAudioLevel(for: app) },
                             onVolumeChange: { volume in
                                 audioEngine.setVolume(for: app, to: volume)
+                            },
+                            onMuteChange: { muted in
+                                audioEngine.setMute(for: app, to: muted)
                             },
                             onDeviceSelected: { newDeviceUID in
                                 audioEngine.setDevice(for: app, deviceUID: newDeviceUID)
@@ -165,7 +171,9 @@ struct MenuBarPopupView: View {
                     audioLevel: Float.random(in: 0...0.7),
                     devices: MockData.sampleDevices,
                     selectedDeviceUID: MockData.sampleDevices[0].uid,
+                    isMuted: false,
                     onVolumeChange: { _ in },
+                    onMuteChange: { _ in },
                     onDeviceSelected: { _ in }
                 )
             }

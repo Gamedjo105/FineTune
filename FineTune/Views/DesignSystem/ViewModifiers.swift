@@ -12,7 +12,12 @@ struct HoverableRowModifier: ViewModifier {
             .padding(.vertical, DesignTokens.Spacing.xs)
             .background(
                 RoundedRectangle(cornerRadius: DesignTokens.Dimensions.buttonRadius)
-                    .fill(isHovered ? DesignTokens.Colors.rowHover : .clear)
+                    .fill(isHovered ? DesignTokens.Colors.rowCardHover : DesignTokens.Colors.rowCard)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: DesignTokens.Dimensions.buttonRadius))
+            .overlay(
+                RoundedRectangle(cornerRadius: DesignTokens.Dimensions.buttonRadius)
+                    .stroke(Color.white.opacity(0.15), lineWidth: 0.5)
             )
             .onHover { hovering in
                 isHovered = hovering

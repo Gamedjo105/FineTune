@@ -10,11 +10,19 @@ struct AppRow: View {
     let audioLevel: Float
     let devices: [AudioDevice]
     let selectedDeviceUID: String
+    let isMutedExternal: Bool  // Mute state from AudioEngine
     let onVolumeChange: (Float) -> Void
+    let onMuteChange: (Bool) -> Void
     let onDeviceSelected: (String) -> Void
 
     @State private var sliderValue: Double  // 0-1, log-mapped position
     @State private var isEditing = false
+
+    /// Show muted icon when explicitly muted OR volume is 0
+    private var showMutedIcon: Bool { isMutedExternal || sliderValue == 0 }
+
+    /// Default volume to restore when unmuting from 0 (50% = unity gain)
+    private let defaultUnmuteVolume: Double = 0.5
 
     init(
         app: AudioApp,
@@ -22,7 +30,9 @@ struct AppRow: View {
         audioLevel: Float = 0,
         devices: [AudioDevice],
         selectedDeviceUID: String,
+        isMuted: Bool = false,
         onVolumeChange: @escaping (Float) -> Void,
+        onMuteChange: @escaping (Bool) -> Void,
         onDeviceSelected: @escaping (String) -> Void
     ) {
         self.app = app
@@ -30,7 +40,9 @@ struct AppRow: View {
         self.audioLevel = audioLevel
         self.devices = devices
         self.selectedDeviceUID = selectedDeviceUID
+        self.isMutedExternal = isMuted
         self.onVolumeChange = onVolumeChange
+        self.onMuteChange = onMuteChange
         self.onDeviceSelected = onDeviceSelected
         // Convert linear gain to slider position
         self._sliderValue = State(initialValue: VolumeMapping.gainToSlider(volume))
@@ -50,6 +62,20 @@ struct AppRow: View {
                 .lineLimit(1)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
+            // Mute button
+            MuteButton(isMuted: showMutedIcon) {
+                if showMutedIcon {
+                    // Unmute: restore to default if at 0
+                    if sliderValue == 0 {
+                        sliderValue = defaultUnmuteVolume
+                    }
+                    onMuteChange(false)
+                } else {
+                    // Mute
+                    onMuteChange(true)
+                }
+            }
+
             // Volume slider with unity marker - fixed width for alignment
             MinimalSlider(
                 value: $sliderValue,
@@ -59,9 +85,14 @@ struct AppRow: View {
                 }
             )
             .frame(width: 140)
+            .opacity(showMutedIcon ? 0.5 : 1.0)
             .onChange(of: sliderValue) { _, newValue in
                 let gain = VolumeMapping.sliderToGain(newValue)
                 onVolumeChange(gain)
+                // Auto-unmute when slider moved while muted
+                if isMutedExternal {
+                    onMuteChange(false)
+                }
             }
 
             // Volume percentage (0-200% matching slider position)
@@ -93,10 +124,12 @@ struct AppRow: View {
 struct AppRowWithLevelPolling: View {
     let app: AudioApp
     let volume: Float
+    let isMuted: Bool
     let devices: [AudioDevice]
     let selectedDeviceUID: String
     let getAudioLevel: () -> Float
     let onVolumeChange: (Float) -> Void
+    let onMuteChange: (Bool) -> Void
     let onDeviceSelected: (String) -> Void
 
     @State private var displayLevel: Float = 0
@@ -109,7 +142,9 @@ struct AppRowWithLevelPolling: View {
             audioLevel: displayLevel,
             devices: devices,
             selectedDeviceUID: selectedDeviceUID,
+            isMuted: isMuted,
             onVolumeChange: onVolumeChange,
+            onMuteChange: onMuteChange,
             onDeviceSelected: onDeviceSelected
         )
         .onAppear {
@@ -147,6 +182,7 @@ struct AppRowWithLevelPolling: View {
                 devices: MockData.sampleDevices,
                 selectedDeviceUID: MockData.sampleDevices[0].uid,
                 onVolumeChange: { _ in },
+                onMuteChange: { _ in },
                 onDeviceSelected: { _ in }
             )
 
@@ -157,6 +193,7 @@ struct AppRowWithLevelPolling: View {
                 devices: MockData.sampleDevices,
                 selectedDeviceUID: MockData.sampleDevices[1].uid,
                 onVolumeChange: { _ in },
+                onMuteChange: { _ in },
                 onDeviceSelected: { _ in }
             )
 
@@ -167,6 +204,7 @@ struct AppRowWithLevelPolling: View {
                 devices: MockData.sampleDevices,
                 selectedDeviceUID: MockData.sampleDevices[2].uid,
                 onVolumeChange: { _ in },
+                onMuteChange: { _ in },
                 onDeviceSelected: { _ in }
             )
         }
@@ -184,6 +222,7 @@ struct AppRowWithLevelPolling: View {
                     devices: MockData.sampleDevices,
                     selectedDeviceUID: MockData.sampleDevices.randomElement()!.uid,
                     onVolumeChange: { _ in },
+                    onMuteChange: { _ in },
                     onDeviceSelected: { _ in }
                 )
             }

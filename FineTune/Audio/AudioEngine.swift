@@ -99,6 +99,15 @@ final class AudioEngine {
         volumeState.getVolume(for: app.id)
     }
 
+    func setMute(for app: AudioApp, to muted: Bool) {
+        volumeState.setMute(for: app.id, to: muted, identifier: app.persistenceIdentifier)
+        taps[app.id]?.isMuted = muted
+    }
+
+    func getMute(for app: AudioApp) -> Bool {
+        volumeState.getMute(for: app.id)
+    }
+
     func setDevice(for app: AudioApp, deviceUID: String) {
         guard appDeviceRouting[app.id] != deviceUID else { return }
         appDeviceRouting[app.id] = deviceUID
@@ -146,8 +155,9 @@ final class AudioEngine {
             }
             appDeviceRouting[app.id] = deviceUID
 
-            // Load saved volume
+            // Load saved volume and mute state
             let savedVolume = volumeState.loadSavedVolume(for: app.id, identifier: app.persistenceIdentifier)
+            let savedMute = volumeState.loadSavedMute(for: app.id, identifier: app.persistenceIdentifier)
 
             // Always create tap for audio apps (always-on strategy)
             ensureTapExists(for: app, deviceUID: deviceUID)
@@ -161,6 +171,11 @@ final class AudioEngine {
                 let displayPercent = Int(VolumeMapping.gainToSlider(volume) * 200)
                 logger.debug("Applying saved volume \(displayPercent)% to \(app.name)")
                 taps[app.id]?.volume = volume
+            }
+
+            if let muted = savedMute, muted {
+                logger.debug("Applying saved mute state to \(app.name)")
+                taps[app.id]?.isMuted = true
             }
         }
     }

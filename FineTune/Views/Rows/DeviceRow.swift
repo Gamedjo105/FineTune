@@ -15,6 +15,12 @@ struct DeviceRow: View {
     @State private var sliderValue: Double
     @State private var isEditing = false
 
+    /// Show muted icon when system muted OR volume is 0
+    private var showMutedIcon: Bool { isMuted || sliderValue == 0 }
+
+    /// Default volume to restore when unmuting from 0 (50%)
+    private let defaultUnmuteVolume: Double = 0.5
+
     init(
         device: AudioDevice,
         isDefault: Bool,
@@ -58,12 +64,20 @@ struct DeviceRow: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
 
             // Mute button
-            IconButton(
-                systemName: isMuted ? "speaker.slash.fill" : "speaker.wave.2.fill",
-                isActive: isMuted,
-                helpText: isMuted ? "Unmute" : "Mute",
-                action: onMuteToggle
-            )
+            MuteButton(isMuted: showMutedIcon) {
+                if showMutedIcon {
+                    // Unmute: restore to default if at 0
+                    if sliderValue == 0 {
+                        sliderValue = defaultUnmuteVolume
+                    }
+                    if isMuted {
+                        onMuteToggle()  // Toggle system mute
+                    }
+                } else {
+                    // Mute
+                    onMuteToggle()  // Toggle system mute
+                }
+            }
 
             // Volume slider
             MinimalSlider(
@@ -72,7 +86,7 @@ struct DeviceRow: View {
                     isEditing = editing
                 }
             )
-            .opacity(isMuted ? 0.5 : 1.0)
+            .opacity(showMutedIcon ? 0.5 : 1.0)
             .onChange(of: sliderValue) { _, newValue in
                 onVolumeChange(Float(newValue))
                 // Auto-unmute when slider moved while muted

@@ -13,11 +13,14 @@ enum DesignTokens {
         /// Clear background - relies on .ultraThinMaterial
         static let surfaceBackground = Color.clear
 
-        /// Row hover state background
-        static let rowHover = Color.white.opacity(0.06)
+        /// Row card background - darker than container
+        static let rowCard = Color.white.opacity(0.08)
+
+        /// Row card hover - slightly brighter
+        static let rowCardHover = Color.white.opacity(0.12)
 
         /// Row active/pressed state
-        static let rowActive = Color.white.opacity(0.10)
+        static let rowActive = Color.white.opacity(0.14)
 
         // MARK: Slider
 
@@ -138,7 +141,7 @@ enum DesignTokens {
 
     enum Dimensions {
         /// Main popup width
-        static let popupWidth: CGFloat = 480
+        static let popupWidth: CGFloat = 540
 
         /// Max height for scrollable content
         static let maxScrollHeight: CGFloat = 400
@@ -168,7 +171,7 @@ enum DesignTokens {
         static let vuMeterWidth: CGFloat = 28
 
         /// VU meter bar height
-        static let vuMeterBarHeight: CGFloat = 3
+        static let vuMeterBarHeight: CGFloat = 10
 
         /// VU meter bar spacing
         static let vuMeterBarSpacing: CGFloat = 2

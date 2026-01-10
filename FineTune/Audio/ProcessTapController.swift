@@ -41,6 +41,10 @@ final class ProcessTapController {
     // Used during device switching to prevent clicks/pops
     private nonisolated(unsafe) var _forceSilence: Bool = false
 
+    // Mute flag - when true, output zeros (user-initiated mute)
+    // Separate from _forceSilence which is for device switching
+    private nonisolated(unsafe) var _isMuted: Bool = false
+
     // Device volume compensation scalar (applied during/after crossfade)
     // Computed as: sourceDeviceVolume / destinationDeviceVolume
     private nonisolated(unsafe) var _deviceVolumeCompensation: Float = 1.0
@@ -62,6 +66,11 @@ final class ProcessTapController {
     var volume: Float {
         get { _volume }
         set { _volume = newValue }
+    }
+
+    var isMuted: Bool {
+        get { _isMuted }
+        set { _isMuted = newValue }
     }
 
     // Target device UID (always explicit)
@@ -669,6 +678,17 @@ final class ProcessTapController {
                 // Zero the entire output buffer
                 memset(outputData, 0, Int(outputBuffer.mDataByteSize))
             }
+            return
+        }
+
+        // Check user mute flag (atomic Bool read)
+        // When muted, output zeros and show no VU meter activity
+        if _isMuted {
+            for outputBuffer in outputBuffers {
+                guard let outputData = outputBuffer.mData else { continue }
+                memset(outputData, 0, Int(outputBuffer.mDataByteSize))
+            }
+            _peakLevel = 0.0
             return
         }
 
