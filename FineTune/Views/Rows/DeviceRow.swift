@@ -45,7 +45,7 @@ struct DeviceRow: View {
             // Default device selector
             RadioButton(isSelected: isDefault, action: onSetDefault)
 
-            // Device icon
+            // Device icon (vibrancy-aware)
             Group {
                 if let icon = device.icon {
                     Image(nsImage: icon)
@@ -53,6 +53,8 @@ struct DeviceRow: View {
                         .aspectRatio(contentMode: .fit)
                 } else {
                     Image(systemName: "speaker.wave.2")
+                        .symbolRenderingMode(.hierarchical)
+                        .foregroundStyle(.secondary)
                 }
             }
             .frame(width: DesignTokens.Dimensions.iconSize, height: DesignTokens.Dimensions.iconSize)
@@ -79,8 +81,8 @@ struct DeviceRow: View {
                 }
             }
 
-            // Volume slider
-            MinimalSlider(
+            // Volume slider (Liquid Glass)
+            LiquidGlassSlider(
                 value: $sliderValue,
                 onEditingChanged: { editing in
                     isEditing = editing

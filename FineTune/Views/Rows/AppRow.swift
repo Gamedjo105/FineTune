@@ -23,15 +23,25 @@ struct AppRow: View {
     @State private var sliderValue: Double  // 0-1, log-mapped position
     @State private var isEditing = false
     @State private var isIconHovered = false
+    @State private var isEQButtonHovered = false
+    @State private var localEQSettings: EQSettings
 
     /// Show muted icon when explicitly muted OR volume is 0
     private var showMutedIcon: Bool { isMutedExternal || sliderValue == 0 }
 
+    /// EQ button color following same pattern as MuteButton
+    private var eqButtonColor: Color {
+        if isEQExpanded {
+            return DesignTokens.Colors.interactiveActive
+        } else if isEQButtonHovered {
+            return DesignTokens.Colors.interactiveHover
+        } else {
+            return DesignTokens.Colors.interactiveDefault
+        }
+    }
+
     /// Default volume to restore when unmuting from 0 (50% = unity gain)
     private let defaultUnmuteVolume: Double = 0.5
-
-    /// Fixed height for EQ panel (header ~24 + spacing 10 + sliders 100 + padding 20 + top margin 8)
-    private let eqPanelHeight: CGFloat = 165
 
     init(
         app: AudioApp,
@@ -65,11 +75,13 @@ struct AppRow: View {
         self.onEQToggle = onEQToggle
         // Convert linear gain to slider position
         self._sliderValue = State(initialValue: VolumeMapping.gainToSlider(volume))
+        // Initialize local EQ state for reactive UI updates
+        self._localEQSettings = State(initialValue: eqSettings)
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            // Main row content
+        ExpandableGlassRow(isExpanded: isEQExpanded) {
+            // Header: Main row content (always visible)
             HStack(spacing: DesignTokens.Spacing.sm) {
                 // App icon - clickable to activate app
                 Image(nsImage: app.icon)
@@ -111,19 +123,8 @@ struct AppRow: View {
                         }
                     }
 
-                    // EQ button
-                    Button {
-                        onEQToggle()
-                    } label: {
-                        Image(systemName: "slider.vertical.3")
-                            .font(.system(size: 12))
-                            .foregroundColor(isEQExpanded ? .accentColor : (eqSettings.isEnabled ? .accentColor.opacity(0.7) : .secondary))
-                    }
-                    .buttonStyle(.plain)
-                    .help("Equalizer")
-
-                    // Volume slider with unity marker
-                    MinimalSlider(
+                    // Volume slider with unity marker (Liquid Glass)
+                    LiquidGlassSlider(
                         value: $sliderValue,
                         showUnityMarker: true,
                         onEditingChanged: { editing in
@@ -148,24 +149,51 @@ struct AppRow: View {
                     // VU Meter (shows gray bars when muted or volume is 0)
                     VUMeter(level: audioLevel, isMuted: showMutedIcon)
 
-                    // Device picker - takes remaining space in controls
+                    // Device picker
                     DevicePicker(
                         devices: devices,
                         selectedDeviceUID: selectedDeviceUID,
                         onDeviceSelected: onDeviceSelected
                     )
+
+                    // EQ button at end of row (animates to X when expanded)
+                    Button {
+                        onEQToggle()
+                    } label: {
+                        ZStack {
+                            Image(systemName: "slider.vertical.3")
+                                .opacity(isEQExpanded ? 0 : 1)
+                                .rotationEffect(.degrees(isEQExpanded ? 90 : 0))
+
+                            Image(systemName: "xmark")
+                                .opacity(isEQExpanded ? 1 : 0)
+                                .rotationEffect(.degrees(isEQExpanded ? 0 : -90))
+                        }
+                        .font(.system(size: 12))
+                        .symbolRenderingMode(.hierarchical)
+                        .foregroundStyle(eqButtonColor)
+                        .frame(
+                            minWidth: DesignTokens.Dimensions.minTouchTarget,
+                            minHeight: DesignTokens.Dimensions.minTouchTarget
+                        )
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .onHover { isEQButtonHovered = $0 }
+                    .help(isEQExpanded ? "Close Equalizer" : "Equalizer")
+                    .animation(.spring(response: 0.3, dampingFraction: 0.75), value: isEQExpanded)
+                    .animation(DesignTokens.Animation.hover, value: isEQButtonHovered)
                 }
                 .frame(width: DesignTokens.Dimensions.controlsWidth)
             }
             .frame(height: DesignTokens.Dimensions.rowContentHeight)
-
-            // Expandable EQ panel - hardcoded height for smooth animation
+        } expandedContent: {
+            // EQ panel - shown when expanded
+            // SwiftUI calculates natural height via conditional rendering
             EQPanelView(
-                settings: Binding(
-                    get: { eqSettings },
-                    set: { onEQChange($0) }
-                ),
+                settings: $localEQSettings,
                 onPresetSelected: { preset in
+                    localEQSettings = preset.settings
                     onEQChange(preset.settings)
                 },
                 onSettingsChanged: { settings in
@@ -173,15 +201,15 @@ struct AppRow: View {
                 }
             )
             .padding(.top, DesignTokens.Spacing.sm)
-            .frame(height: isEQExpanded ? eqPanelHeight : 0, alignment: .top)
-            .opacity(isEQExpanded ? 1 : 0)
-            .allowsHitTesting(isEQExpanded)
         }
-        .hoverableRow()
         .onChange(of: volume) { _, newValue in
             // Only sync from external changes when user is NOT dragging
             guard !isEditing else { return }
             sliderValue = VolumeMapping.gainToSlider(newValue)
+        }
+        .onChange(of: eqSettings) { _, newValue in
+            // Sync from parent when external EQ settings change
+            localEQSettings = newValue
         }
     }
 }
@@ -196,6 +224,7 @@ struct AppRowWithLevelPolling: View {
     let devices: [AudioDevice]
     let selectedDeviceUID: String
     let getAudioLevel: () -> Float
+    let isPopupVisible: Bool
     let onVolumeChange: (Float) -> Void
     let onMuteChange: (Bool) -> Void
     let onDeviceSelected: (String) -> Void
@@ -215,6 +244,7 @@ struct AppRowWithLevelPolling: View {
         devices: [AudioDevice],
         selectedDeviceUID: String,
         getAudioLevel: @escaping () -> Float,
+        isPopupVisible: Bool = true,
         onVolumeChange: @escaping (Float) -> Void,
         onMuteChange: @escaping (Bool) -> Void,
         onDeviceSelected: @escaping (String) -> Void,
@@ -230,6 +260,7 @@ struct AppRowWithLevelPolling: View {
         self.devices = devices
         self.selectedDeviceUID = selectedDeviceUID
         self.getAudioLevel = getAudioLevel
+        self.isPopupVisible = isPopupVisible
         self.onVolumeChange = onVolumeChange
         self.onMuteChange = onMuteChange
         self.onDeviceSelected = onDeviceSelected
@@ -258,14 +289,27 @@ struct AppRowWithLevelPolling: View {
             onEQToggle: onEQToggle
         )
         .onAppear {
-            startLevelPolling()
+            if isPopupVisible {
+                startLevelPolling()
+            }
         }
         .onDisappear {
             stopLevelPolling()
         }
+        .onChange(of: isPopupVisible) { _, visible in
+            if visible {
+                startLevelPolling()
+            } else {
+                stopLevelPolling()
+                displayLevel = 0  // Reset meter when hidden
+            }
+        }
     }
 
     private func startLevelPolling() {
+        // Guard against duplicate timers
+        guard levelTimer == nil else { return }
+
         levelTimer = Timer.scheduledTimer(
             withTimeInterval: DesignTokens.Timing.vuMeterUpdateInterval,
             repeats: true
