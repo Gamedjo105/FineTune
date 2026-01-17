@@ -14,6 +14,7 @@ struct MuteButton: View {
         Button(action: action) {
             Image(systemName: isMuted ? "speaker.slash.fill" : "speaker.wave.2.fill")
                 .font(.system(size: 14))
+                .symbolRenderingMode(.hierarchical)  // Vibrancy support
                 .foregroundStyle(buttonColor)
                 .scaleEffect(isPulsing ? 1.1 : 1.0)
                 .frame(

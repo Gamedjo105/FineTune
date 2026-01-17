@@ -51,8 +51,14 @@ struct DevicePickerView: View {
             }
             .padding(.horizontal, 8)
             .padding(.vertical, 4)
-            .background(Color.secondary.opacity(0.12))
-            .cornerRadius(6)
+            .background {
+                RoundedRectangle(cornerRadius: DesignTokens.Dimensions.buttonRadius)
+                    .fill(.thinMaterial)
+            }
+            .overlay {
+                RoundedRectangle(cornerRadius: DesignTokens.Dimensions.buttonRadius)
+                    .strokeBorder(DesignTokens.Colors.menuBorder, lineWidth: 0.5)
+            }
         }
         .menuStyle(.borderlessButton)
     }

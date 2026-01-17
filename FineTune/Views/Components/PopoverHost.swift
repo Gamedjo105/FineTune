@@ -56,7 +56,7 @@ struct PopoverHost<Content: View>: NSViewRepresentable {
             panel.backgroundColor = .clear
             panel.level = .popUpMenu
             panel.hasShadow = true
-            panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
+            panel.collectionBehavior = [.fullScreenAuxiliary]
 
             panel.becomesKeyOnlyIfNeeded = true
 
