@@ -283,7 +283,7 @@ final class ProcessTapController {
         var sourceVolume: Float = 1.0
         var sourceSampleRate: Float64 = 0
         if let sourceUID = currentDeviceUID {
-            if let sourceDevice = deviceMonitor?.device(for: sourceUID) {
+            if let sourceDevice = await deviceMonitor?.device(for: sourceUID) {
                 // Cache hit - use O(1) lookup
                 sourceVolume = sourceDevice.id.readOutputVolumeScalar()
                 sourceSampleRate = (try? sourceDevice.id.readNominalSampleRate()) ?? 0
@@ -305,7 +305,7 @@ final class ProcessTapController {
         var destSampleRate: Float64 = 0
         var isBluetoothDestination = false
 
-        if let destDevice = deviceMonitor?.device(for: newOutputUID) {
+        if let destDevice = await deviceMonitor?.device(for: newOutputUID) {
             // Cache hit - use O(1) lookup
             destVolume = destDevice.id.readOutputVolumeScalar()
             destSampleRate = (try? destDevice.id.readNominalSampleRate()) ?? 0
@@ -548,23 +548,34 @@ final class ProcessTapController {
         var sourceVolume: Float = 1.0
         var destVolume: Float = 1.0
 
-        // Fast path: use cached device lookup (O(1)), fallback to readDeviceList if cache miss
+        // Fast path: use cached device lookup (O(1))
+        var cachedSource: AudioDevice?
+        var cachedDest: AudioDevice?
+
         if let sourceUID = currentDeviceUID {
-            if let sourceDevice = deviceMonitor?.device(for: sourceUID) {
-                sourceVolume = sourceDevice.id.readOutputVolumeScalar()
-            }
-            if let destDevice = deviceMonitor?.device(for: newOutputUID) {
-                destVolume = destDevice.id.readOutputVolumeScalar()
+            if let monitor = deviceMonitor {
+                cachedSource = await monitor.device(for: sourceUID)
+                cachedDest = await monitor.device(for: newOutputUID)
             }
 
-            // Fallback if cache misses
-            if deviceMonitor == nil || (deviceMonitor?.device(for: sourceUID) == nil && deviceMonitor?.device(for: newOutputUID) == nil) {
+            // Use cached values if available
+            if let source = cachedSource {
+                sourceVolume = source.id.readOutputVolumeScalar()
+            }
+            if let dest = cachedDest {
+                destVolume = dest.id.readOutputVolumeScalar()
+            }
+
+            // Fallback for any missing device
+            if cachedSource == nil || cachedDest == nil {
                 if let devices = try? AudioObjectID.readDeviceList() {
-                    if let sourceDevice = devices.first(where: { (try? $0.readDeviceUID()) == sourceUID }) {
-                        sourceVolume = sourceDevice.readOutputVolumeScalar()
+                    if cachedSource == nil,
+                       let source = devices.first(where: { (try? $0.readDeviceUID()) == sourceUID }) {
+                        sourceVolume = source.readOutputVolumeScalar()
                     }
-                    if let destDevice = devices.first(where: { (try? $0.readDeviceUID()) == newOutputUID }) {
-                        destVolume = destDevice.readOutputVolumeScalar()
+                    if cachedDest == nil,
+                       let dest = devices.first(where: { (try? $0.readDeviceUID()) == newOutputUID }) {
+                        destVolume = dest.readOutputVolumeScalar()
                     }
                 }
             }
