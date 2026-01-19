@@ -12,7 +12,7 @@ Per-application audio control for macOS. Set individual volume levels, route app
 
 - Per-app volume control with mute
 - Per-device volume control with mute
-- Route apps to different output devices (music to speakers, calls to headphones)
+- Route apps to different output devices
 - 10-band equalizer with 20 presets across 5 categories
 - Real-time VU meters
 - Volume boost up to 200%
