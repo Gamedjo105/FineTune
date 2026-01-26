@@ -95,7 +95,8 @@ private struct IconOption: View {
                 }
             }
             .foregroundStyle(isSelected ? DesignTokens.Colors.accentPrimary : DesignTokens.Colors.textSecondary)
-            .frame(width: 32, height: 32)
+            .frame(width: 30, height: 30)
+            .contentShape(Rectangle())
             .background {
                 RoundedRectangle(cornerRadius: 6)
                     .fill(isSelected ? DesignTokens.Colors.accentPrimary.opacity(0.15) : Color.clear)

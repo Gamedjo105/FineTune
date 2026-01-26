@@ -269,7 +269,7 @@ enum DesignTokens {
         static let settingsIconWidth: CGFloat = 24
 
         /// Settings slider width
-        static let settingsSliderWidth: CGFloat = 150
+        static let settingsSliderWidth: CGFloat = 200
 
         /// Settings percentage text width
         static let settingsPercentageWidth: CGFloat = 44
